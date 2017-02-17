@@ -84,19 +84,16 @@ def requestSummaryContent(requestContentType, requestFormatType, resultFilePath)
     #
     print_("Example content request service for content type %s\n" % (requestContentType))
     #
-    USEKEY = os.getenv("ONEDEP_BIOCURATION_USE_API_KEY") if os.getenv("ONEDEP_BIOCURATION_USE_API_KEY") else False
     # Flag for mock service for testing -
     mockService = True if os.getenv("ONEDEP_API_MOCK_SERVICE") == "Y" else False
     #
     # Check for alternative URL and KEY settings in the environment -
     #
     apiUrl = os.getenv("ONEDEP_BIOCURATION_API_URL") if os.getenv("ONEDEP_BIOCURATION_API_URL") else __apiUrl__
-    if (USEKEY):
-        keyFilePath = os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") if os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") else "~/.onedep_biocuration_apikey.jwt"
-        apiKey = readApiKey(keyFilePath)
-        cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
-    else:
-        cr = ContentRequest(apiUrl=apiUrl)
+    keyFilePath = os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") if os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") else "~/.onedep_biocuration_apikey.jwt"
+    apiKey = readApiKey(keyFilePath)
+    cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
+
     #
     # Create a new service session -
     #
@@ -146,7 +143,7 @@ def requestSummaryContent(requestContentType, requestFormatType, resultFilePath)
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3:
         # Use test case if no arguments are provided -
         requestContentType = "report-summary-example-test"
         requestFormatType = 'json'

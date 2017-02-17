@@ -6,8 +6,6 @@
 /README.txt -text
 /__init__.py -text
 bin/onedep_request -text
-examples_insitu/register.py -text
-examples_insitu/report-summary-example-test.json -text
 examples_insitu/request-entry-report.py -text
 examples_insitu/request-entry-report.sh -text
 examples_insitu/request-summary-report.py -text
