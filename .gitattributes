@@ -1,2 +1,25 @@
 * text=auto !eol
+/HISTORY.txt -text
+/LICENSE -text
+/MANIFEST.in -text
+/README.md -text
+/README.txt -text
 /__init__.py -text
+bin/onedep_request -text
+examples_insitu/register.py -text
+examples_insitu/report-summary-example-test.json -text
+examples_insitu/request-entry-report.py -text
+examples_insitu/request-entry-report.sh -text
+examples_insitu/request-summary-report.py -text
+examples_insitu/request-summary-report.sh -text
+examples_insitu/setup-test-env.sh -text
+onedep_biocuration/__init__.py -text
+onedep_biocuration/api/ContentRequest.py -text
+onedep_biocuration/api/Register.py -text
+onedep_biocuration/api/__init__.py -text
+onedep_biocuration/cli/__init__.py -text
+onedep_biocuration/cli/biocuration_cli.py -text
+onedep_biocuration/utils/ApiBase.py -text
+onedep_biocuration/utils/__init__.py -text
+/setup.cfg -text
+/setup.py -text
