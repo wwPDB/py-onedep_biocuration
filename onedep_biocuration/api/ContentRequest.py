@@ -92,13 +92,6 @@ class ContentRequest(ApiBase):
         """
         return self.post(endPoint="session_index")
 
-    def getActivity(self):
-        """  Return a summary service activity for the current service user.
-
-         :rtype: json service response converted to dictionary (catalog plus keys - api_error_flag, api_status_text, activity_summary)
-        """
-        return self.post(endPoint="activity")
-
     def __run(self, endPoint, **params):
         """  Submit request to the input endPoint using the current session data context.
 

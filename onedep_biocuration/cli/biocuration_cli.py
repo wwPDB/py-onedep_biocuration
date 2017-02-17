@@ -28,7 +28,6 @@ __license__ = "Apache 2.0"
 
 
 import logging
-import datetime
 import sys
 import six
 import os.path
@@ -50,7 +49,6 @@ except:
 
 from onedep_biocuration import __apiUrl__
 
-from onedep_biocuration.api.Register import Register
 from onedep_biocuration.api.ContentRequest import ContentRequest
 
 
@@ -132,36 +130,6 @@ def displayIndex(sD):
         print_("Error processing session index")
 
 
-def displayActivity(sD):
-    #
-    format = "%a %b %d %H:%M:%S %Y"
-    print_("\nOneDep Request Activity Summary:\n")
-    try:
-        if 'activity_summary' in sD and len(sD) > 0:
-            print_("%25s : %-25s\n" % ("Category    ", "Count            "))
-            print_("%25s : %-25s\n" % ("------------", "-----------------"))
-            for ky in sD['activity_summary']:
-                if ky not in ['session_list']:
-                    val = sD['activity_summary'][ky]
-                    print_("%25s : %-25s\n" % (ky, val))
-            if 'session_list' in sD['activity_summary']:
-                print_("\n%-25s : %-10s: %-25s: %-45s\n" % (" Session Creation Time", "Status    ", "Time after submit (secs)", "Session Identifier"))
-                print_("%25s : %-10s: %-25s: %-45s\n" % ("------------------------", "----------", "------------------------ ", "----------------------------------------"))
-                for s in sD['activity_summary']['session_list']:
-                    tiso = s[1]
-                    dt = datetime.datetime.strptime(tiso[:19], '%Y-%m-%dT%H:%M:%S')
-                    fdt = dt.strftime(format)
-                    if s[3] == "0" or s[3] == 0:
-                        print_("%25s : %-10s: %24s : %-45s\n" % (fdt, s[2], "", s[0]))
-                    else:
-                        print_("%25s : %-10s: %24.2f : %-45s\n" % (fdt, s[2], s[3], s[0]))
-
-        else:
-            print_("No session activity data\n")
-    except:
-        print_("Error processing activity summary")
-
-
 def filterPath(inpPath):
     try:
         return os.path.expanduser(inpPath)
@@ -198,26 +166,7 @@ def run():
             onedep_biocuration --output_file status.json --output_content_type request-status-xxxx
 
     """
-    # Registration is required for the Biocuration API
-    registerDescription = """
 
-    To register an API Key:
-
-            Request a OneDep API access Key.  API keys are sent to your e-mail\n
-            address and are valid for 30 days.
-
-        onedep_biocuration --register --email <user@hostname>
-
-            For convenience, the API access key may be stored in a hidden file
-            in your home directory. Copy the API access key e-mail attachment
-            as follows.
-
-        cp onedep_biocuration_apikey.jwt ~/.onedep_biocuration_apikey.jwt
-
-    """
-    USEKEY = os.getenv("ONEDEP_BIOCURATION_USE_API_KEY") if os.getenv("ONEDEP_BIOCURATION_USE_API_KEY") else False
-    if USEKEY:
-        description += registerDescription
     #
     try:
         parser = ArgParser(description=description, formatter_class=RawTextHelpFormatter)
@@ -321,29 +270,11 @@ def run():
                         default=__apiUrl__,
                         help="API base URL")
     #
-    if USEKEY:
-        #
-        #  Api key registration options web service api.
-        parser.add_argument('--email',
-                            type=six.text_type,
-                            default=None,
-                            help="e-mail address to receive OneDep API key")
-
-        parser.add_argument('--register', action='store_true', dest='register', default=False,
-                            help='Register to receive a OneDep API by e-mail')
-
-        parser.add_argument('--api_key_file',
-                            dest="apiKeyFile",
-                            type=six.text_type,
-                            default=filterPath("~/.onedep_biocuration_apikey.jwt"),
-                            help="File containing a OneDep API key (default: %(default)s)")
-        #
-        # This option requires a valid apikey -
-        parser.add_argument('--activity',
-                            dest='activityOp',
-                            action='store_true',
-                            default=False,
-                            help="Request a summary of service requests - this option requires an API key")
+    parser.add_argument('--api_key_file',
+                        dest="apiKeyFile",
+                        type=six.text_type,
+                        default=filterPath("~/.onedep_biocuration_apikey.jwt"),
+                        help="File containing a OneDep API key (default: %(default)s)")
     #
     #
     options = parser.parse_args()
@@ -379,19 +310,14 @@ def run():
     apiUrl = args.apiUrl
     apiKey = None
     #
-    if USEKEY:
-        # Register for a new API key and exit -
-        if args.register and args.email:
-            reg = Register(apiUrl=apiUrl)
-            rD = reg.register(email=args.email)
-            displayStatus(rD, exitFlag=True)
-        #
-        # Read API key file -
-        if args.apiKeyFile:
-            apiKey = readApiKey(args.apiKeyFile)
-            if not apiKey:
-                parser.print_usage()
-                raise SystemExit("\nError reading Api key file %s" % filterPath(args.apiKeyFile))
+
+    #
+    # Read API key file -
+    if args.apiKeyFile:
+        apiKey = readApiKey(args.apiKeyFile)
+        if not apiKey:
+            parser.print_usage()
+            raise SystemExit("\nError reading Api key file %s" % filterPath(args.apiKeyFile))
 
     # Create a new session or recover cached session data -
     sessionId = None
@@ -461,14 +387,6 @@ def run():
         else:
             iRet = 0
             print_("%d" % iRet)
-    #
-    if USEKEY:
-        if args.activityOp and apiKey and apiKey != "anonymous":
-            cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
-            cr.setSession(sessionId)
-            rD = cr.getActivity()
-            displayStatus(rD)
-            displayActivity(rD)
 
 
 if __name__ == '__main__':

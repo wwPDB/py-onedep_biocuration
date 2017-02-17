@@ -15,7 +15,6 @@ examples_insitu/request-summary-report.sh -text
 examples_insitu/setup-test-env.sh -text
 onedep_biocuration/__init__.py -text
 onedep_biocuration/api/ContentRequest.py -text
-onedep_biocuration/api/Register.py -text
 onedep_biocuration/api/__init__.py -text
 onedep_biocuration/cli/__init__.py -text
 onedep_biocuration/cli/biocuration_cli.py -text
