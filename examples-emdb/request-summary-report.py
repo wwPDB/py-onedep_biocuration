@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-request-entry-report.py <entry_id> <request_content_type> <output_file>
+request-summary-report.py <request_content_type> <output_file>
 
-request-entry-report.py D_800002 report-entry-example-sasbdb D_800002_report-entry-example-sasbdb.json
+request-summary-report.py report-summary-example-emdb-status  report-summary-example-emdb-status.json
 
 ^^^^^^^^^^
 
-Example of wwPDB OneDep Biocuration API entry content service -
+Example of wwPDB OneDep Biocuration API summary content service -
 
 :copyright: @wwPDB
 :license: Apache 2.0
@@ -65,29 +65,28 @@ def displayIndex(sD):
     print_("\nSession File Index:\n")
     try:
         if 'index' in sD and len(sD) > 0:
-            print_("%50s \n" % (" File name  "))
-            print_("%50s \n" % ("------------"))
+            print_("%50s\n" % (" File name  "))
+            print_("%50s\n" % ("------------"))
             for ky in sD['index']:
                 fn, fmt = sD['index'][ky]
                 if fmt in ['json']:
-                    print_("%50s \n" % (fn))
+                    print_("%50s\n" % fn)
         else:
             print_("No index content\n")
     except:
         print_("Error processing session index")
 
 
-def requestEntryContent(requestEntryId, requestContentType, requestFormatType, resultFilePath):
-    """ Example of OneDep API content request.
+def requestSummaryContent(requestContentType, requestFormatType, resultFilePath):
+    """ Example of OneDep API summary content request.
 
-        :param string requestEntryId :   the entry deposition data set identifier (D_0000000000)
         :param string requestContentType : the request content type
         :param string requestFormatType :  the request format type
         :param string resultFilePaht :  result file path for the requested content
 
     """
     #
-    print_("Example content request service for: \n +entry   %s\n +content type %s\n" % (requestEntryId, requestContentType))
+    print_("Example content request service for content type %s\n" % (requestContentType))
     #
     # Flag for mock service for testing -
     mockService = True if os.getenv("ONEDEP_API_MOCK_SERVICE") == "Y" else False
@@ -95,7 +94,7 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
     # Check for alternative URL and KEY settings in the environment -
     #
     apiUrl = os.getenv("ONEDEP_BIOCURATION_API_URL") if os.getenv("ONEDEP_BIOCURATION_API_URL") else __apiUrl__
-    keyFilePath = os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") if os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") else "onedep_biocuration_apikey_sasbdb.jwt"
+    keyFilePath = os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") if os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") else "onedep_biocuration_apikey_emdb.jwt"
     apiKey = readApiKey(keyFilePath)
     cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
 
@@ -107,7 +106,7 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
     displayStatus(rD)
     #
     #
-    print_("Request entry identifier %s content type %s\n" % (requestEntryId, requestContentType))
+    print_("Request content type %s\n" % (requestContentType))
     #
     # Submit service request
     if mockService:
@@ -115,10 +114,10 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
         pD['worker_test_mode'] = True
         pD['worker_test_duration'] = int(os.getenv("ONEDEP_API_MOCK_DURATION"))
         print_("Using mock service setup %r\n" % pD)
-        rD = cr.requestEntryContent(requestEntryId, requestContentType, requestFormatType, **pD)
+        rD = cr.requestSummaryContent(requestContentType, requestFormatType, **pD)
     else:
         print_("Submitted content service request\n")
-        rD = cr.requestEntryContent(requestEntryId, requestContentType, requestFormatType)
+        rD = cr.requestSummaryContent(requestContentType, requestFormatType)
     displayStatus(rD)
     #
     #   Poll for service completion -
@@ -148,16 +147,14 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 4:
-        # Use test case if no arguments are provided -
-        requestContentType = "report-entry-example-sasbdb"
+    if len(sys.argv) < 3:
+        # Use this test case if no arguments are provided -
+        requestContentType = "report-summary-example-emdb-status"
         requestFormatType = 'json'
-        requestEntryId = os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") if os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") else "D_800002"
-        resultFileName = requestEntryId + '_' + requestContentType + '.' + requestFormatType
+        resultFileName = requestContentType + '.' + requestFormatType
     else:
-        requestEntryId = sys.argv[1]
-        requestContentType = sys.argv[2]
-        resultFileName = sys.argv[3]
+        requestContentType = sys.argv[1]
+        resultFileName = sys.argv[2]
         requestFormatType = 'json'
     #
-    requestEntryContent(requestEntryId, requestContentType, requestFormatType, resultFileName)
+    requestSummaryContent(requestContentType, requestFormatType, resultFileName)

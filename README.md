@@ -1,12 +1,13 @@
 ## OneDep Biocuration Content Web Service Interface
 
 ### Introduction
+
 The OneDep content web service provides selective access to content within the Biocuration system designed
 to support data exchange between wwPDB OneDep and federated partner sites.
 
 This service is provided as a Python package. Once installed, access is provided using a
-command line client or pragmatically using a Python API.   Access to these services requires an API
-key which can be requested by e-mail to site hosting the API web service.
+command line client or pragmatically using a Python API.   Access to these services requires
+an API key which can be requested by e-mail to site hosting the API web service.
 
 ### Installation
 
@@ -17,14 +18,16 @@ pip install onedep_biocuration_api
 ```
 
 ### Command Line Usage
-A binary script is installed called ```onedep_biocuration_cli``` which is a front end that invokes the packages APIs.
+
+A binary script is installed called ```onedep_request``` which is a front end that invokes the packages APIs.
 
 
 #### Start a new session
+
 You must start a new session. The system keeps track of the current working session in the file ```~/.onedep_biocuration_current_session``` This can be changed with the *--session_file* argument.
 
 ```
-onedep_biocuration_cli --new_session
+onedep_request --new_session
 ```
 
 #### Request entry reports
@@ -32,21 +35,21 @@ onedep_biocuration_cli --new_session
 Initiate an entry report request with the command:
 
 ```
-onedep_biocuration_cli --entry_id <data set id D_0000000000>  --entry_content_type  <report content type>
+onedep_request --entry_id <data set id D_0000000000>  --entry_content_type  <report content type>
 
-onedep_biocuration_cli --entry_id D_0000000000 --entry_content_type  'report-entry-example-test'
+onedep_request --entry_id D_0000000000 --entry_content_type  'report-entry-example-test'
 ```
 
 You can periodically check if the request is complete with the command:
 
 ```
-onedep_biocuration_cli --status
+onedep_request --status
 ```
 
 or if you would like a value of 0 or 1:
 
 ```
-onedep_biocuration_cli --test_complete
+onedep_request --test_complete
 ```
 
 #### Retrieving results
@@ -54,8 +57,8 @@ onedep_biocuration_cli --test_complete
 When complete, you can retrieve the report results using:
 
 ```
-onedep_biocuration_cli --output_file <json file>    --output_type <report_content_type>
-onedep_biocuration_cli --output_file myreport.json  --output_type 'report-entry-example-test'
+onedep_request --output_file <json file>    --output_type <report_content_type>
+onedep_request --output_file myreport.json  --output_type 'report-entry-example-test'
 
 
 ```

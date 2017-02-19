@@ -49,7 +49,7 @@ setup(
     ),
     entry_points={
         'console_scripts': [
-            'onedep_biocuration_cli=onedep_biocuration.cli.biocuration_cli:run',
+            'onedep_request=onedep_biocuration.cli.biocuration_cli:run',
         ]
     },
     #

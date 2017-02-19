@@ -2,7 +2,7 @@
 """
 request-entry-report.py <entry_id> <request_content_type> <output_file>
 
-request-entry-report.py D_800002 report-entry-example-sasbdb D_800002_report-entry-example-sasbdb.json
+request-entry-report.py D_800004 report-entry-example-emdb D_800004_report-entry-example-emdb.json
 
 ^^^^^^^^^^
 
@@ -95,7 +95,7 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
     # Check for alternative URL and KEY settings in the environment -
     #
     apiUrl = os.getenv("ONEDEP_BIOCURATION_API_URL") if os.getenv("ONEDEP_BIOCURATION_API_URL") else __apiUrl__
-    keyFilePath = os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") if os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") else "onedep_biocuration_apikey_sasbdb.jwt"
+    keyFilePath = os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") if os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") else "onedep_biocuration_apikey_emdb.jwt"
     apiKey = readApiKey(keyFilePath)
     cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
 
@@ -149,10 +149,10 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
 if __name__ == '__main__':
 
     if len(sys.argv) < 4:
-        # Use test case if no arguments are provided -
-        requestContentType = "report-entry-example-sasbdb"
+        # Use this test case if no arguments are provided -
+        requestContentType = "report-entry-example-emdb"
         requestFormatType = 'json'
-        requestEntryId = os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") if os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") else "D_800002"
+        requestEntryId = os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") if os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") else "D_800004"
         resultFileName = requestEntryId + '_' + requestContentType + '.' + requestFormatType
     else:
         requestEntryId = sys.argv[1]

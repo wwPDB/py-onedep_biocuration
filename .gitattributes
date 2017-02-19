@@ -6,6 +6,17 @@
 /README.txt -text
 /__init__.py -text
 bin/onedep_request -text
+examples-emdb/INSTALL-DRAFT.pdf -text
+examples-emdb/README-EMDB.md -text
+examples-emdb/README-EMDB.pdf -text
+examples-emdb/onedep_biocuration_apikey_emdb.jwt -text
+examples-emdb/request-entry-report.py -text
+examples-emdb/request-entry-report.sh -text
+examples-emdb/request-summary-report.py -text
+examples-emdb/request-summary-report.sh -text
+examples-sasbdb/INSTALL-DRAFT.pdf -text
+examples-sasbdb/README-SASBDB.md -text
+examples-sasbdb/README-SASBDB.pdf -text
 examples-sasbdb/onedep_biocuration_apikey_sasbdb.jwt -text
 examples-sasbdb/request-entry-report.py -text
 examples-sasbdb/request-entry-report.sh -text
