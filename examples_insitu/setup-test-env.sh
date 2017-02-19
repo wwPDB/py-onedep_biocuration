@@ -7,7 +7,7 @@ unset ONEDEP_BIOCURATION_EXTRA_ARGS
 unset ONEDEP_API_MOCK_SERVICE
 unset ONEDEP_API_MOCK_DURATION
 #
-USE_LOCAL="Y"
+USE_LOCAL="N"
 if [ ${USE_LOCAL} == "Y" ]
 then
     #  For local development platform -

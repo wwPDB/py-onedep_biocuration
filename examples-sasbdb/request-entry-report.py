@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) < 4:
         # Use test case if no arguments are provided -
-        requestContentType = "report-entry-example-test"
+        requestContentType = "report-entry-example-sasbdb"
         requestFormatType = 'json'
         requestEntryId = os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") if os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") else "D_1000000001"
         resultFileName = requestEntryId + '_' + requestContentType + '.' + requestFormatType

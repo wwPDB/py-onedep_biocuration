@@ -5,4 +5,4 @@ __email__ = "john.westbrook@rcsb.org"
 __license__ = "Apache 2.0"
 __version__ = "0.01"
 
-__apiUrl__ = "https://onedep-biocuration-apiws.wwpdb.org"
+__apiUrl__ = "https://da-devel-1-ann.rcsb.rutgers.edu"

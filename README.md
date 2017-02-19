@@ -79,7 +79,7 @@ from onedep_biocuration import __apiUrl__
 from onedep_biocuration.api.ContentRequest import ContentRequest
 
 def requestEntryContent(requestEntryId, requestContentType, requestFormatType, resultFilePath):
-    """ Example of OneDep API  entry content request.
+    """ Example of OneDep API content request.
 
         :param string requestEntryId :   the entry deposition data set identifier (D_0000000000)
         :param string requestContentType : the request content type
@@ -93,7 +93,6 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
     # Check for alternative URL and KEY settings in the environment -
     #
     apiUrl = os.getenv("ONEDEP_BIOCURATION_API_URL") if os.getenv("ONEDEP_BIOCURATION_API_URL") else __apiUrl__
-
     keyFilePath = os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") if os.getenv("ONEDEP_BIOCURATION_API_KEY_PATH") else "~/.onedep_biocuration_apikey.jwt"
     apiKey = readApiKey(keyFilePath)
     cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
@@ -108,7 +107,10 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
     #
     print_("Request entry identifier %s content type %s\n" % (requestEntryId, requestContentType))
     #
-        rD = cr.requestEntryContent(requestEntryId, requestContentType, requestFormatType)
+    # Submit service request
+
+    print_("Submitted content service request\n")
+    rD = cr.requestEntryContent(requestEntryId, requestContentType, requestFormatType)
     displayStatus(rD)
     #
     #   Poll for service completion -
@@ -129,10 +131,6 @@ def requestEntryContent(requestEntryId, requestContentType, requestFormatType, r
     print_("Storing content type %s  in result file %s\n" % (requestContentType, resultFilePath))
     rD = cr.getOutputByType(resultFilePath, requestContentType, formatType=requestFormatType)
     displayStatus(rD)
-    #
-    iD = cr.getIndex()
-    displayIndex(iD)
-    #
     print_("Completed\n")
 
 ```
