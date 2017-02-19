@@ -148,7 +148,7 @@ if __name__ == '__main__':
         # Use test case if no arguments are provided -
         requestContentType = "report-entry-example-test"
         requestFormatType = 'json'
-        requestEntryId = "D_1000000001"
+        requestEntryId = os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") if os.getenv("ONEDEP_BIOCURATION_TEST_ENTRY_ID") else "D_1000000001"
         resultFileName = requestEntryId + '_' + requestContentType + '.' + requestFormatType
     else:
         requestEntryId = sys.argv[1]

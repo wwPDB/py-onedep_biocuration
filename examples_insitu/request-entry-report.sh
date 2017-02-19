@@ -3,7 +3,7 @@
 # File:  request-entry-report.sh
 # Date:  14-Feb-2017  Jdw
 #
-SLEEP=2
+SLEEP=1
 THISDIR="$( builtin cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TD=$(dirname ${THISDIR})
 #
@@ -22,7 +22,7 @@ ${TD}/bin/onedep_request --new_session ${X_ARGS}
 #
 # Submit request to run service
 #
-${TD}/bin/onedep_request --entry_id D_1000000001 --entry_content_type "report-entry-example-test"  ${X_ARGS}
+${TD}/bin/onedep_request --entry_id ${ONEDEP_BIOCURATION_TEST_ENTRY_ID} --entry_content_type "report-entry-example-test"  ${X_ARGS}
 #
 # Poll for completion status
 #
@@ -48,8 +48,6 @@ ${TD}/bin/onedep_request --status ${X_ARGS}
 ${TD}/bin/onedep_request --index  ${X_ARGS}
 #
 #  Download report (by file type)
-${TD}/bin/onedep_request --output_file D_1000000001-report-entry-example-test-${TS}.json  --output_type "report-entry-example-test" ${X_ARGS}
+${TD}/bin/onedep_request --output_file ${ONEDEP_BIOCURATION_TEST_ENTRY_ID}-report-entry-example-test-${TS}.json  --output_type "report-entry-example-test" ${X_ARGS}
 #
-#  Get a summary of service activity -
-# ${TD}/bin/onedep_request --activity ${X_ARGS}
 #
