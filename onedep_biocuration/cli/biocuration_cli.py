@@ -115,15 +115,13 @@ def displayIndex(sD):
     #
     print_("\nOneDep Session File Index:\n")
     try:
-        cr = ContentRequest()
-        ctL = cr.getContentTypes()
         if 'index' in sD and len(sD) > 0:
-            print_("%25s : %-25s\n" % ("Content Type", "Session File Name"))
-            print_("%25s : %-25s\n" % ("------------", "-----------------"))
+            print_("%50s\n" % ("Session File Name"))
+            print_("%50s\n" % ("-----------------"))
             for ky in sD['index']:
-                if ky in ctL:
-                    fn, fmt = sD['index'][ky]
-                    print_("%25s : %-25s\n" % (ky, fn))
+                fn, fmt = sD['index'][ky]
+                if fmt in ['json']:
+                    print_("%50s\n" % (ky))
         else:
             print_("No session content\n")
     except:
@@ -381,6 +379,7 @@ def run():
         cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
         cr.setSession(sessionId)
         rD = cr.getStatus()
+        #
         if 'status' in rD and rD['status'] in ['completed', 'failed']:
             iRet = 1
             print_("%d" % iRet)
