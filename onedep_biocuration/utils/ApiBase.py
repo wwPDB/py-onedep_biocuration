@@ -33,6 +33,7 @@ import sys
 import os
 import copy
 import hashlib
+
 # import warnings
 
 import requests
@@ -44,13 +45,12 @@ except ImportError:
     import simplejson as json
 
 from onedep_biocuration import __version__
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.packages.urllib3.exceptions import InsecureRequestWarning  # pylint: disable=E0401
 
 log = logging.getLogger(__name__)
 
 
 class ApiBase(object):
-
     def __init__(self, apiKey=None, userAgent=None, apiName=None, apiUrl=None, verify=True):
         """
         Core methods supporting the OneDep web client API.
@@ -62,54 +62,52 @@ class ApiBase(object):
         :param string verify:  (Optional) verify SSL certificate
 
         """
-        log.debug('Service initializing')
+        log.debug("Service initializing")
         self.__chunkSize = 2048
         #
-        self._apiUrl = apiUrl if apiUrl else 'https://localhost'
+        self._apiUrl = apiUrl if apiUrl else "https://localhost"
         self._apiKey = apiKey if apiKey else "anonymous"
-        self._apiName = apiName if apiName else 'onedep'
+        self._apiName = apiName if apiName else "onedep"
         #
         self.__myreq = requests.session()
-        self.__myreq.headers['User-Agent'] = userAgent if userAgent else 'OneDepApiClient/%s Python/%s ' % (__version__, sys.version.split()[0])
-        self.__myreq.headers['wwpdb-api-token'] = "%s %s" % ("Bearer", self._apiKey)
+        self.__myreq.headers["User-Agent"] = userAgent if userAgent else "OneDepApiClient/%s Python/%s " % (__version__, sys.version.split()[0])
+        self.__myreq.headers["wwpdb-api-token"] = "%s %s" % ("Bearer", self._apiKey)
         #
-        self._returnApiErrorFlagKey = 'onedep_error_flag'
-        self._returnApiStatusTextKey = 'onedep_status_text'
+        self._returnApiErrorFlagKey = "onedep_error_flag"
+        self._returnApiStatusTextKey = "onedep_status_text"
         #
         self._sessionId = None
         #
         self._verify = verify
         self._reservedContentTypes = {}
         if not verify:
-            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # pylint: disable=no-member
 
     def createSession(self):
-        """  Create and maintain a session context in all subsequent API requests.
+        """Create and maintain a session context in all subsequent API requests.
 
-             :rtype: json service response converted to dictionary (with mininal keys: api_error_flag, api_status_text, session_id)
+        :rtype: json service response converted to dictionary (with mininal keys: api_error_flag, api_status_text, session_id)
         """
         # create a new session context
         pD = {}
         rD = self.post("session", **pD)
-        self._sessionId = rD.get('session_id', None)
+        self._sessionId = rD.get("session_id", None)
         return rD
 
     def setSession(self, sessionId):
-        """ Set the identifier for the current session context.
-        """
+        """Set the identifier for the current session context."""
         self._sessionId = sessionId
 
     def getSession(self):
         return self._sessionId
 
     def __addSessionContext(self, pD, auto=False):
-        """  Internal method to add the current session context to the input parameter dictionary.
-        """
+        """Internal method to add the current session context to the input parameter dictionary."""
         if not self._sessionId and auto:
             self.createSession()
         #
-        if 'session_id' not in pD:
-            pD['session_id'] = self.getSession()
+        if "session_id" not in pD:
+            pD["session_id"] = self.getSession()
 
     def setApiReturnStatusKeys(self, errorFlagKey, statusTextKey):
         self._returnApiErrorFlagKey = errorFlagKey
@@ -119,13 +117,13 @@ class ApiBase(object):
         try:
             self._reservedContentTypes = copy.deepcopy(contentTypeDict)
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             return False
 
     def getContentTypes(self):
         try:
             return self._reservedContentTypes.keys()
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             return []
 
     def getContentFormatList(self, contentType):
@@ -140,10 +138,10 @@ class ApiBase(object):
                 return self._reservedContentTypes[contentType][0]
             else:
                 return None
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             return None
 
-    def downloadByName(self, dstPath, fileName, endPoint='download', **params):
+    def downloadByName(self, dstPath, fileName, endPoint="download", **params):
         """Construct GET request to download the target fileName to dstPath.
 
         :param string fileName: file name target for download
@@ -158,10 +156,10 @@ class ApiBase(object):
         for p in params:
             _params[p] = params[p]
 
-        _params['filename'] = fileName
+        _params["filename"] = fileName
         return self.__download(dstPath, endPoint, **_params)
 
-    def downloadByType(self, dstPath, contentType, endPoint='download', **params):
+    def downloadByType(self, dstPath, contentType, endPoint="download", **params):
         """Construct GET request to download the target data object type to dstPath.
 
         :param string contentType: data object content type target download
@@ -181,13 +179,13 @@ class ApiBase(object):
         _params = {}
         for p in params:
             _params[p] = params[p]
-        _params['contenttype'] = contentType
-        _params['formattype'] = self.getContentFormatDefault(contentType)
+        _params["contenttype"] = contentType
+        _params["formattype"] = self.getContentFormatDefault(contentType)
 
         #
         return self.__download(dstPath, endPoint=endPoint, **_params)
 
-    def download(self, dstPath, contentType, formatType, endPoint='download', **params):
+    def download(self, dstPath, contentType, formatType, endPoint="download", **params):
         """Construct GET request to download the target data object type to dstPath.
 
         :param string contentType: data object content type target download
@@ -202,12 +200,12 @@ class ApiBase(object):
         _params = {}
         for p in params:
             _params[p] = params[p]
-        _params['contenttype'] = contentType
-        _params['formattype'] = formatType
+        _params["contenttype"] = contentType
+        _params["formattype"] = formatType
         #
         return self.__download(dstPath, endPoint=endPoint, **_params)
 
-    def __download(self, dstPath, endPoint='download', **params):
+    def __download(self, dstPath, endPoint="download", **params):
         """Internal method to construct GET request to download the content/format type to dstPath.
 
         :param string dstPath: full path to file for download
@@ -222,7 +220,7 @@ class ApiBase(object):
             _params[p] = params[p]
         #
         self.__addSessionContext(_params)
-        log.debug(' DOWNLOAD BEGINS for : %s %r' % (dstPath, _params))
+        log.debug(" DOWNLOAD BEGINS for : %s %r", dstPath, _params)
         #
         rD = {}
         rD[self._returnApiErrorFlagKey] = True
@@ -230,18 +228,18 @@ class ApiBase(object):
         #
         url = self.__encodeUrl(self._apiUrl, self._apiName, endPoint, **_params)
         #
-        log.debug('Request: URL: %r', url)
+        log.debug("Request: URL: %r", url)
         #
         try:
             response = self.__myreq.get(url, data=_params, verify=self._verify, stream=True)
             if response.status_code == 200:
-                with open(dstPath, 'wb') as f:
+                with open(dstPath, "wb") as f:
                     for chunk in response.iter_content(self.__chunkSize):
                         f.write(chunk)
             rD[self._returnApiErrorFlagKey] = False
-            rD[self._returnApiStatusTextKey] = 'ok'
-            log.debug("download request headers %r" % response.request.headers)
-            log.debug("download response headers %r" % response.headers)
+            rD[self._returnApiStatusTextKey] = "ok"
+            log.debug("download request headers %r", response.request.headers)
+            log.debug("download response headers %r", response.headers)
         except Exception as e:
             return self.__filterExceptions(e, msgDefault="Download request processing exception")
 
@@ -251,20 +249,20 @@ class ApiBase(object):
 
         try:
             myDigest = self.getMD5(dstPath)
-            theDigest = response.headers['checksum_md5']
+            theDigest = response.headers["checksum_md5"]
             if myDigest != theDigest:
                 rD[self._returnApiErrorFlagKey] = True
-                rD[self._returnApiStatusTextKey] = 'Checksum failure'
+                rD[self._returnApiStatusTextKey] = "Checksum failure"
             else:
                 log.debug("checksum comparison success")
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             rD[self._returnApiErrorFlagKey] = True
             rD[self._returnApiStatusTextKey] = "Download checksum processing error %r " % dstPath
             # log.exception("Local file processing error %r" % dstPath)
 
         return rD
 
-    def upload(self, filePath, contentType, fileFormat, endPoint='upload', **params):
+    def upload(self, filePath, contentType, fileFormat, endPoint="upload", **params):
         """Construct POST request to perform multipart/ file upload and return the JSON response.
 
         :param string filepath: full path to file for upload
@@ -281,7 +279,7 @@ class ApiBase(object):
         >>> r = requests.post(url, files=files)
 
         """
-        log.debug('upload request: %s %s %s' % (filePath, contentType, fileFormat))
+        log.debug("upload request: %s %s %s", filePath, contentType, fileFormat)
         rD = {}
         rD[self._returnApiErrorFlagKey] = True
         rD[self._returnApiStatusTextKey] = "Miscellaneous api failure"
@@ -295,35 +293,35 @@ class ApiBase(object):
             rD[self._returnApiStatusTextKey] = "Unrecognized file format"
             return rD
         #
-        log.debug(' A params %r' % (params))
+        log.debug(" A params %r", params)
         _params = {}
         for p in params:
             _params[p] = params[p]
-        log.debug(' B _params %r' % (_params))
+        log.debug(" B _params %r", _params)
         self.__addSessionContext(_params)
-        log.debug(' C _params %r' % (_params))
+        log.debug(" C _params %r", _params)
         #
         try:
             md5 = self.getMD5(filePath)
-            _params['checksum_md5'] = md5
+            _params["checksum_md5"] = md5
             _, fn = os.path.split(filePath)
-            fobj = open(filePath, 'rb')
-            fD = {'file': (fn, fobj)}
-            _params['content_type'] = contentType
-            _params['file_format'] = fileFormat
-        except:
+            fobj = open(filePath, "rb")
+            fD = {"file": (fn, fobj)}
+            _params["content_type"] = contentType
+            _params["file_format"] = fileFormat
+        except:  # noqa: E722 pylint: disable=bare-except
             rD[self._returnApiErrorFlagKey] = True
             rD[self._returnApiStatusTextKey] = "Input file access or processing error "
             # log.exception("Local file processing error ")
             return rD
         #
-        url = '%s/service/%s/%s' % (self._apiUrl, self._apiName, endPoint)
+        url = "%s/service/%s/%s" % (self._apiUrl, self._apiName, endPoint)
         #
-        log.debug('Request: URL: %s PARAMS: %r', url, _params)
+        log.debug("Request: URL: %s PARAMS: %r", url, _params)
         #
         try:
             response = self.__myreq.post(url, files=fD, data=_params, verify=self._verify)
-            log.debug("post headers %r" % response.request.headers)
+            log.debug("post headers %r", response.request.headers)
         except Exception as e:
             return self.__filterExceptions(e, msgDefault="Upload request processing exception")
 
@@ -334,28 +332,28 @@ class ApiBase(object):
 
         try:
             rD.update(json.loads(response.text))
-            rD[self._returnApiErrorFlagKey] = rD['errorflag']
-            rD[self._returnApiStatusTextKey] = rD['statusmessage']
+            rD[self._returnApiErrorFlagKey] = rD["errorflag"]
+            rD[self._returnApiStatusTextKey] = rD["statusmessage"]
         except Exception as e:
             rD[self._returnApiErrorFlagKey] = True
-            rD[self._returnApiStatusTextKey] = "Upload response processing error %s" % e.message
+            rD[self._returnApiStatusTextKey] = "Upload response processing error %s" % str(e)
             # log.exception("Local upload response processing error ")
 
         return rD
 
     def __filterExceptions(self, exception, msgDefault="OneDep API service failure"):
-        """ Handle typical exceptions and map these to response dictionary -
+        """Handle typical exceptions and map these to response dictionary -
 
-            :param exception: target exception object
+        :param exception: target exception object
 
-            :rtype dictionary:  response dictionary (with mininal keys: api_error_flag, api_status_text)
+        :rtype dictionary:  response dictionary (with mininal keys: api_error_flag, api_status_text)
 
         """
         errorFlag = True
         msg = msgDefault
         try:
-            msg = exception.message
-        except:
+            msg = str(exception)
+        except:  # noqa: E722 pylint: disable=bare-except
             pass
         #
         rD = {}
@@ -364,12 +362,12 @@ class ApiBase(object):
         return rD
 
     def __filterErrors(self, response, msgDefault="OneDep API service failure"):
-        """ Check the response packet for typical error various error types and map these to
-            response dictionary -
+        """Check the response packet for typical error various error types and map these to
+        response dictionary -
 
-            :param rsp request response object: target response object
+        :param rsp request response object: target response object
 
-            :rtype tuple:  errorFlag, response dictionary (with mininal keys: api_error_flag, api_status_text)
+        :rtype tuple:  errorFlag, response dictionary (with mininal keys: api_error_flag, api_status_text)
 
         """
         errorFlag = False
@@ -380,10 +378,10 @@ class ApiBase(object):
                 msg = msgDefault
                 try:
                     errD = json.loads(response.text)
-                    msg = errD['statustext']
-                except:
+                    msg = errD["statustext"]
+                except:  # noqa: E722 pylint: disable=bare-except
                     pass
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             pass
         #
         rD = {}
@@ -403,17 +401,17 @@ class ApiBase(object):
         rD = {}
         rD[self._returnApiErrorFlagKey] = True
         rD[self._returnApiStatusTextKey] = "Miscellaneous api failure"
-        url = '%s/service/%s/%s' % (self._apiUrl, self._apiName, endPoint)
+        url = "%s/service/%s/%s" % (self._apiUrl, self._apiName, endPoint)
         #
         _params = {}
         for p in params:
             _params[p] = params[p]
         self.__addSessionContext(_params)
         #
-        log.debug('Request: %s %s', url, _params)
+        log.debug("Request: %s %s", url, _params)
         try:
             response = self.__myreq.post(url, data=_params, verify=self._verify)
-            log.debug("post headers %r" % response.request.headers)
+            log.debug("post headers %r", response.request.headers)
         except Exception as e:
             return self.__filterExceptions(e, msgDefault="POST request processing exception")
 
@@ -423,11 +421,11 @@ class ApiBase(object):
 
         try:
             rD.update(json.loads(response.text))
-            rD[self._returnApiErrorFlagKey] = rD['errorflag']
-            rD[self._returnApiStatusTextKey] = rD['statusmessage']
+            rD[self._returnApiErrorFlagKey] = rD["errorflag"]
+            rD[self._returnApiStatusTextKey] = rD["statusmessage"]
         except Exception as e:
             rD[self._returnApiErrorFlagKey] = True
-            rD[self._returnApiStatusTextKey] = "POST request processing error %r " % e.message
+            rD[self._returnApiStatusTextKey] = "POST request processing error %r " % str(e)
 
         return rD
 
@@ -450,7 +448,7 @@ class ApiBase(object):
         url = self.__encodeUrl(self._apiUrl, self._apiName, endPoint, **_params)
         try:
             response = self.__myreq.get(url, verify=self._verify)
-            log.debug("get headers %r" % response.request.headers)
+            log.debug("get headers %r", response.request.headers)
         except Exception as e:
             return self.__filterExceptions(e, msgDefault="GET request processing exception")
 
@@ -460,16 +458,16 @@ class ApiBase(object):
         #
         try:
             rD.update(json.loads(response.text))
-            rD[self._returnApiErrorFlagKey] = rD['errorflag']
-            rD[self._returnApiStatusTextKey] = rD['statusmessage']
+            rD[self._returnApiErrorFlagKey] = rD["errorflag"]
+            rD[self._returnApiStatusTextKey] = rD["statusmessage"]
         except Exception as e:
             rD[self._returnApiErrorFlagKey] = True
-            rD[self._returnApiStatusTextKey] = "Request processing error %r" % e.message
+            rD[self._returnApiStatusTextKey] = "Request processing error %r" % str(e)
 
         return rD
 
     def getMD5(self, path, block_size=4096, hr=True):
-        '''
+        """
         Chunked MD5 function -
 
         Block size directly depends on the block size of your filesystem
@@ -479,10 +477,10 @@ class ApiBase(object):
             sudo /sbin/blockdev --getbsz /dev/sda1
             > Block size:               4096
 
-        '''
+        """
         md5 = hashlib.md5()
-        with open(path, 'rb') as f:
-            for chunk in iter(lambda: f.read(block_size), b''):
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(block_size), b""):
                 md5.update(chunk)
         if hr:
             return md5.hexdigest()
@@ -499,16 +497,18 @@ class ApiBase(object):
         """
         qs = []
         for k, v in params.items():
-            qs.append('%s=%s' % (k, six.moves.urllib.parse.quote_plus(str(v))))
+            qs.append("%s=%s" % (k, six.moves.urllib.parse.quote_plus(str(v))))
         #
-        return '%s/service/%s/%s?%s' % (apiUrl, api, endPoint, '&'.join(qs))
+        return "%s/service/%s/%s?%s" % (apiUrl, api, endPoint, "&".join(qs))
 
 
 class ApiException(Exception):
     """Service general exception."""
-    pass
+
+    pass  # pylint: disable=unnecessary-pass
 
 
 class ApiAuthException(Exception):
     """Service authentication exception."""
-    pass
+
+    pass  # pylint: disable=unnecessary-pass

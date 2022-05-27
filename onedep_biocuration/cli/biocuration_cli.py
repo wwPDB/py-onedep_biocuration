@@ -37,19 +37,19 @@ try:
     from argparse import ArgumentParser as ArgParser
     from argparse import RawTextHelpFormatter
 except ImportError:
-    from optparse import OptionParser as ArgParser
+    from optparse import OptionParser as ArgParser  # pylint: disable=deprecated-module
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 #
 try:
     from onedep_biocuration import __version__
-except:
+except:  # noqa: E722 pylint: disable=bare-except
     sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
     from onedep_biocuration import __version__
 
-from onedep_biocuration import __apiUrl__
+from onedep_biocuration import __apiUrl__  # noqa: E402
 
-from onedep_biocuration.api.ContentRequest import ContentRequest
+from onedep_biocuration.api.ContentRequest import ContentRequest  # noqa: E402
 
 
 log = logging.getLogger()
@@ -68,9 +68,9 @@ def readApiKey(filePath):
     apiKey = None
     try:
         fn = os.path.expanduser(filePath)
-        with open(fn, 'r') as fp:
+        with open(fn, "r") as fp:
             apiKey = fp.read()
-    except:
+    except:  # noqa: E722 pylint: disable=bare-except
         pass
     return apiKey
 
@@ -78,10 +78,10 @@ def readApiKey(filePath):
 def writeSessionId(sessionId, filePath):
     try:
         fn = os.path.expanduser(filePath)
-        with open(fn, 'w') as fp:
+        with open(fn, "w") as fp:
             fp.write(sessionId)
         return True
-    except:
+    except:  # noqa: E722 pylint: disable=bare-except,raise-missing-from
         raise SystemExit("Error writing file %r" % filePath)
 
 
@@ -89,24 +89,24 @@ def readSessionId(filePath):
     sessionId = None
     try:
         fn = os.path.expanduser(filePath)
-        log.debug("Getting session from %r" % fn)
-        with open(fn, 'r') as fp:
+        log.debug("Getting session from %r", fn)
+        with open(fn, "r") as fp:
             sessionId = fp.read()
-    except:
-        log.debug("failing for file path %r" % filePath)
+    except:  # noqa: E722 pylint: disable=bare-except
+        log.debug("failing for file path %r", filePath)
 
     return sessionId
 
 
 def displayStatus(sD, exitFlag=False, exitOnError=True):
 
-    if 'onedep_error_flag' in sD and sD['onedep_error_flag']:
-        print_("OneDep error: %s\n" % sD['onedep_status_text'])
+    if "onedep_error_flag" in sD and sD["onedep_error_flag"]:
+        print_("OneDep error: %s\n" % sD["onedep_status_text"])
         if exitOnError:
             raise SystemExit()
     else:
-        if 'status' in sD:
-            print_("OneDep status: %s\n" % sD['status'])
+        if "status" in sD:
+            print_("OneDep status: %s\n" % sD["status"])
     if exitFlag:
         raise SystemExit()
 
@@ -115,28 +115,28 @@ def displayIndex(sD):
     #
     print_("\nOneDep Session File Index:\n")
     try:
-        if 'index' in sD and len(sD) > 0:
+        if "index" in sD and len(sD) > 0:
             print_("%50s\n" % ("Session File Name"))
             print_("%50s\n" % ("-----------------"))
-            for ky in sD['index']:
-                fn, fmt = sD['index'][ky]
-                if fmt in ['json']:
+            for ky in sD["index"]:
+                _fn, fmt = sD["index"][ky]
+                if fmt in ["json"]:
                     print_("%50s\n" % (ky))
         else:
             print_("No session content\n")
-    except:
+    except:  # noqa: E722 pylint: disable=bare-except
         print_("Error processing session index")
 
 
 def filterPath(inpPath):
     try:
         return os.path.expanduser(inpPath)
-    except:
+    except:  # noqa: E722 pylint: disable=bare-except
         return inpPath
 
 
 def run():
-    """ Command line interface for OneDep Biocuration API """
+    """Command line interface for OneDep Biocuration API"""
 
     description = """
     Command line interface for OneDep biocuration API:
@@ -168,7 +168,7 @@ def run():
     #
     try:
         parser = ArgParser(description=description, formatter_class=RawTextHelpFormatter)
-    except:
+    except:  # noqa: E722 pylint: disable=bare-except
         parser = ArgParser(description="Command line interface for OneDep biocuration API")
 
     # For optparse.OptionParser add an `add_argument` method for compatibility with argparse.ArgumentParser
@@ -178,101 +178,55 @@ def run():
         pass
 
     ###
-    parser.add_argument('--session_file',
-                        dest="sessionFile",
-                        type=six.text_type,
-                        default=filterPath("~/.onedep_biocuration_current_session"),
-                        help="File containing current session information (default: %(default)s)")
+    parser.add_argument(
+        "--session_file",
+        dest="sessionFile",
+        type=six.text_type,
+        default=filterPath("~/.onedep_biocuration_current_session"),
+        help="File containing current session information (default: %(default)s)",
+    )
     ##
-    parser.add_argument('--new_session',
-                        dest="newSessionOp",
-                        action='store_true',
-                        default=False,
-                        help="Start a new session")
+    parser.add_argument("--new_session", dest="newSessionOp", action="store_true", default=False, help="Start a new session")
     ##
-    parser.add_argument('--entry_id',
-                        dest="dataSetId",
-                        type=six.text_type,
-                        default=None,
-                        help="Entry identifier [D_0000000000]")
+    parser.add_argument("--entry_id", dest="dataSetId", type=six.text_type, default=None, help="Entry identifier [D_0000000000]")
 
-    parser.add_argument('--entry_content_type',
-                        dest="requestEntryContentType",
-                        type=six.text_type,
-                        default=None,
-                        help="Entry content type")
+    parser.add_argument("--entry_content_type", dest="requestEntryContentType", type=six.text_type, default=None, help="Entry content type")
 
-    parser.add_argument('--summary_content_type',
-                        dest="requestSummaryContentType",
-                        type=six.text_type,
-                        default=None,
-                        help="Summary content type")
+    parser.add_argument("--summary_content_type", dest="requestSummaryContentType", type=six.text_type, default=None, help="Summary content type")
     #
     # Output options -
-    parser.add_argument('--output_file',
-                        dest="outputFile",
-                        type=six.text_type,
-                        default=None,
-                        help="Output file path")
+    parser.add_argument("--output_file", dest="outputFile", type=six.text_type, default=None, help="Output file path")
 
-    parser.add_argument('--output_format_type',
-                        dest='outputFormatType',
-                        type=six.text_type,
-                        default='json',
-                        help="Output file format type")
+    parser.add_argument("--output_format_type", dest="outputFormatType", type=six.text_type, default="json", help="Output file format type")
 
-    parser.add_argument('--output_type',
-                        dest="outputType",
-                        type=six.text_type,
-                        default=None,
-                        help="Target content type to output")
+    parser.add_argument("--output_type", dest="outputType", type=six.text_type, default=None, help="Target content type to output")
     ##
     #   Operational and status options for the service  --
-    parser.add_argument('--status',
-                        dest="statusOp",
-                        action='store_true',
-                        default=False,
-                        help="Get the status of the current session")
+    parser.add_argument("--status", dest="statusOp", action="store_true", default=False, help="Get the status of the current session")
     #
-    parser.add_argument('--test_complete',
-                        dest="completeOp",
-                        action='store_true',
-                        default=False,
-                        help="Return competion status for the current session [1 for done or 0 otherwise]")
+    parser.add_argument(
+        "--test_complete", dest="completeOp", action="store_true", default=False, help="Return competion status for the current session [1 for done or 0 otherwise]"
+    )
     #
-    parser.add_argument('--index',
-                        dest='indexOp',
-                        action='store_true',
-                        default=False,
-                        help="Request index of the data files in the current session")
+    parser.add_argument("--index", dest="indexOp", action="store_true", default=False, help="Request index of the data files in the current session")
     #
-    parser.add_argument('--version', action='store_true', help='Show the version number and exit')
+    parser.add_argument("--version", action="store_true", help="Show the version number and exit")
     ##
-    parser.add_argument('--verbose', action='store_true', help='Set verbose logging')
-    parser.add_argument('--debug', action='store_true', help='Set debug logging')
-    parser.add_argument('--test_mode', dest='testMode', action='store_true', help='Set service in test mode')
-    parser.add_argument('--test_duration',
-                        dest="testModeDuration",
-                        type=int,
-                        default=10,
-                        help="Mock service duration in test mode (seconds, default=10)")
-    parser.add_argument('--log_file',
-                        dest="logFile",
-                        type=six.text_type,
-                        default=None,
-                        help="Local log file path")
+    parser.add_argument("--verbose", action="store_true", help="Set verbose logging")
+    parser.add_argument("--debug", action="store_true", help="Set debug logging")
+    parser.add_argument("--test_mode", dest="testMode", action="store_true", help="Set service in test mode")
+    parser.add_argument("--test_duration", dest="testModeDuration", type=int, default=10, help="Mock service duration in test mode (seconds, default=10)")
+    parser.add_argument("--log_file", dest="logFile", type=six.text_type, default=None, help="Local log file path")
 
-    parser.add_argument('--api_url',
-                        dest="apiUrl",
-                        type=six.text_type,
-                        default=__apiUrl__,
-                        help="API base URL")
+    parser.add_argument("--api_url", dest="apiUrl", type=six.text_type, default=__apiUrl__, help="API base URL")
     #
-    parser.add_argument('--api_key_file',
-                        dest="apiKeyFile",
-                        type=six.text_type,
-                        default=filterPath("~/.onedep_biocuration_apikey.jwt"),
-                        help="File containing a OneDep API key (default: %(default)s)")
+    parser.add_argument(
+        "--api_key_file",
+        dest="apiKeyFile",
+        type=six.text_type,
+        default=filterPath("~/.onedep_biocuration_apikey.jwt"),
+        help="File containing a OneDep API key (default: %(default)s)",
+    )
     #
     #
     options = parser.parse_args()
@@ -288,8 +242,8 @@ def run():
     #
     # Configure logging -
     logging.captureWarnings(True)
-    formatter = logging.Formatter('%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s')
-    logging.basicConfig(format='%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s')
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+    logging.basicConfig(format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
     if args.logFile:
         handler = logging.FileHandler(args.logFile)
         handler.setFormatter(formatter)
@@ -323,7 +277,7 @@ def run():
         cr = ContentRequest(apiKey=apiKey, apiUrl=apiUrl)
         rD = cr.createSession()
         displayStatus(rD)
-        sessionId = rD['session_id']
+        sessionId = rD["session_id"]
         writeSessionId(sessionId, args.sessionFile)
     else:
         sessionId = readSessionId(args.sessionFile)
@@ -338,11 +292,11 @@ def run():
         cr.setSession(sessionId)
         # optional test mode configuration
         if args.testMode:
-            pD['worker_test_mode'] = True
+            pD["worker_test_mode"] = True
         if args.testModeDuration:
-            pD['worker_test_duration'] = args.testModeDuration
+            pD["worker_test_duration"] = args.testModeDuration
         else:
-            pD['worker_test_duration'] = 10
+            pD["worker_test_duration"] = 10
         #
         #
         rD = {}
@@ -380,7 +334,7 @@ def run():
         cr.setSession(sessionId)
         rD = cr.getStatus()
         #
-        if 'status' in rD and rD['status'] in ['completed', 'failed']:
+        if "status" in rD and rD["status"] in ["completed", "failed"]:
             iRet = 1
             print_("%d" % iRet)
         else:
@@ -388,5 +342,5 @@ def run():
             print_("%d" % iRet)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
