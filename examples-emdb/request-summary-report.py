@@ -111,13 +111,16 @@ def requestSummaryContent(requestContentType, requestFormatType, resultFilePath)
     # Submit service request
     if mockService:
         pD = {}
+        # pD['query_site'] = "SOME_OTHER_SITE"
         pD['worker_test_mode'] = True
         pD['worker_test_duration'] = int(os.getenv("ONEDEP_API_MOCK_DURATION"))
         print_("Using mock service setup %r\n" % pD)
         rD = cr.requestSummaryContent(requestContentType, requestFormatType, **pD)
     else:
+        pD = {}
+        # pD['query_site'] = "WWPDB_DEPLOY_PRODUCTION_RU"
         print_("Submitted content service request\n")
-        rD = cr.requestSummaryContent(requestContentType, requestFormatType)
+        rD = cr.requestSummaryContent(requestContentType, requestFormatType, **pD)
     displayStatus(rD)
     #
     #   Poll for service completion -
