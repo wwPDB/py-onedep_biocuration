@@ -16,6 +16,7 @@ Updates:
     30-Sep-2016 jdw  add additional path conditioning -
     01-Dec-2016 jdw  make api key functions for this cli controlled by env var ONEDEP_USE_API_KEY
     14-Feb-2017 jdw  adapt options for biocuration api
+    31-May-2022 ep   add site request for reports
 
 """
 from __future__ import print_function
@@ -193,6 +194,8 @@ def run():
     parser.add_argument("--entry_content_type", dest="requestEntryContentType", type=six.text_type, default=None, help="Entry content type")
 
     parser.add_argument("--summary_content_type", dest="requestSummaryContentType", type=six.text_type, default=None, help="Summary content type")
+
+    parser.add_argument("--query_site", dest="requestSummaryQuerySite", type=six.text_type, default=None, help="For summary content types, option site id")
     #
     # Output options -
     parser.add_argument("--output_file", dest="outputFile", type=six.text_type, default=None, help="Output file path")
@@ -297,6 +300,9 @@ def run():
             pD["worker_test_duration"] = args.testModeDuration
         else:
             pD["worker_test_duration"] = 10
+        # option query site
+        if args.requestSummaryContentType and args.requestSummaryQuerySite:
+            pD["query_site"] = args.requestSummaryQuerySite
         #
         #
         rD = {}
