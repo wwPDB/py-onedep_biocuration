@@ -9,6 +9,9 @@ ONEDEP_BIOCURATION_API_KEY_PATH="onedep_biocuration_apikey_emdb.jwt"
 CONTENT_TYPE="report-entry-example-emdb"
 ONEDEP_BIOCURATION_TEST_ENTRY_ID="D_800004"
 X_ARGS=" --session_file ./.onedep_biocuration_session_${TS} --api_key_file  ${ONEDEP_BIOCURATION_API_KEY_PATH} "
+
+. /wwpdb_da/site-config/init/env.sh -h `/bin/hostname`
+
 #
 # New session  -
 #
