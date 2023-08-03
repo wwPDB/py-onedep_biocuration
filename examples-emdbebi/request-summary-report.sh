@@ -5,7 +5,7 @@
 #
 #
 TS=`/bin/date "+%Y%m%d%H%M%S"`_$$
-ONEDEP_BIOCURATION_API_KEY_PATH="onedep_biocuration_apikey_emdb.jwt"
+ONEDEP_BIOCURATION_API_KEY_PATH="onedep_biocuration_apikey_emdbebi.jwt"
 CONTENT_TYPE="report-summary-emdb-status"
 X_ARGS=" --session_file ./.onedep_biocuration_session_${TS} --api_key_file  ${ONEDEP_BIOCURATION_API_KEY_PATH} "
 
