@@ -4,6 +4,16 @@
 # Date:  14-Feb-2017  Jdw
 #
 #
+
+
+if [ "${1}" == "" ]
+then
+    echo "ERROR: Must provide site id as input argument."
+    exit 1
+fi
+
+siteId=${1}
+
 TS=`/bin/date "+%Y%m%d%H%M%S"`_$$
 ONEDEP_BIOCURATION_API_KEY_PATH="onedep_biocuration_apikey_emdbebi.jwt"
 CONTENT_TYPE="report-summary-emdb-status"
@@ -19,7 +29,7 @@ onedep_request --new_session ${X_ARGS}
 #
 # Submit request to run service
 #
-onedep_request --summary_content_type ${CONTENT_TYPE}  ${X_ARGS}
+onedep_request --summary_content_type ${CONTENT_TYPE} --query_site ${siteId} ${X_ARGS}
 #
 #
 # Poll for completion status
